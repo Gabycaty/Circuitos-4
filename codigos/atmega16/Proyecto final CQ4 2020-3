@@ -1,0 +1,72 @@
+/*
+FINAL DE ELECTRONICA 4
+
+*/
+
+#define F_CPU 1000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+
+
+int main(void)
+{
+DDRA = 0x00;			//Configura todos los pines del Puerto A como Entrada.
+DDRC =0xFF;				// defino puerto C como salida
+PORTC=0x00;				// inicia con las salidas apagadas
+int velocidad=0;
+
+while(1)				//inicio de mi bucle infinito
+
+{
+
+if((PINA & (1<<PINA0)))// pregunto si el switch de encendido está accionado
+{
+PORTC |= (1<<PORTC0);   // encender led rojo que indica sistema encendido
+
+if((PINA & (1<<PINA1)))// pregunto si el switch de acelerador está accionado
+{
+PORTC |= (1<<PORTC1);   // envio a encender led amarillo que indica acelerador activo
+if((PINA & (1<<PINA2)))
+{
+if((PINA & (1<<PINA3)))
+{
+velocidad=velocidad+1;
+if (velocidad>2){velocidad=0;}
+_delay_ms(1000);
+}
+
+}
+
+if (velocidad==1){ PORTC |= (1<<PORTC2);} // enciendo velocidad 2
+if (velocidad==2){ PORTC |= (1<<PORTC3);} // enciendo velocidad 3
+if (velocidad==0){ PORTC &=~(1<<PORTC2);PORTC &=~(1<<PORTC3);} // apago velocidad 2 y 3
+
+
+}
+
+else if(!(PINA & (1<<PINA1)))// pregunto si el switch de acelerador no está accionado
+{
+PORTC &=~ (1<<PORTC1);// apagar puerto (acelerador desactivado)
+}
+
+}
+
+
+
+
+
+
+else if(!(PINA & (1<<PINA0)))//pregunto si el switch de encendido NO está accionado
+{
+PORTC &=~ (1<<PORTC0); // apagar sistema de encendido
+PORTC &=~ (1<<PORTC1); // desactivar acelerador
+PORTC &=~(1<<PORTC3); // apago velocidad 3
+PORTC &=~(1<<PORTC2); // apago velocidad 2
+velocidad=0;
+}
+
+
+
+
+}	// fin de mi bucle infinito
+}
